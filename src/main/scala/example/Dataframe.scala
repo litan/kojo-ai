@@ -1,9 +1,9 @@
 package example
 
-import dataframe.ColumnAdderInstances._
-import dataframe.ColumnAdderSyntax._
-import dataframe._
-import plot._
+import net.kogics.kojo.dataframe.ColumnAdderInstances._
+import net.kogics.kojo.dataframe.ColumnAdderSyntax._
+import net.kogics.kojo.dataframe._
+import net.kogics.kojo.plot._
 import tech.tablesaw.aggregate.AggregateFunctions.sum
 import tech.tablesaw.api.Table
 

@@ -1,3 +1,5 @@
+package net.kogics.kojo
+
 import java.util
 
 import org.knowm.xchart.CategoryChart

@@ -1,3 +1,5 @@
+package net.kogics.kojo
+
 import tech.tablesaw.aggregate.AggregateFunctions.max
 import tech.tablesaw.aggregate.AggregateFunctions.mean
 import tech.tablesaw.aggregate.AggregateFunctions.median
@@ -13,6 +15,14 @@ import tech.tablesaw.api.Table
 import tech.tablesaw.columns.Column
 
 package object dataframe {
+  def readCsv(filename: String) = {
+    Table.read().csv(filename)
+  }
+
+  def writeCsv(table: Table, filename: String): Unit = {
+    table.write().csv(filename)
+  }
+
   implicit class DataFrame(df: Table) {
     def length = df.rowCount
     def head(n: Int = 5) = df.first(n)

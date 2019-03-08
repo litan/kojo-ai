@@ -2,7 +2,7 @@ package example
 
 import org.knowm.xchart.SwingWrapper
 
-import plot._
+import net.kogics.kojo.plot._
 
 object Plot {
   def main(args: Array[String]): Unit = {

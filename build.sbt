@@ -1,4 +1,4 @@
-name := "Kojo-ML"
+name := "Kojo-AI"
 
 version := "0.1"
 
