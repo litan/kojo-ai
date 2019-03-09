@@ -10,7 +10,8 @@ import tech.tablesaw.api.Table
 object Dataframe {
   def main(args: Array[String]): Unit = {
     val df = Table.read().csv("/home/lalit/t1/Downloads/xAPI-Edu-Data.csv")
-    df.structure
+    println(df.structure)
+    df.columns(Seq("gender"))
     df.head()
     df.stringColumn("gender").isMissing().size
 
@@ -23,7 +24,7 @@ object Dataframe {
     df.select("Class", "Failed")
 
     // group-by; split-apply-combine
-    println(df.summarize("Failed", sum).by("Topic"))
+    df.summarize("Failed", sum).by("Topic")
     // cross tab
     df.xTabCounts("Topic", "Class")
     // frequencies for categorical var

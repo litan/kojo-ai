@@ -1,5 +1,8 @@
 package net.kogics.kojo
 
+import scala.reflect.runtime.universe.TypeTag
+import scala.reflect.runtime.universe.typeOf
+
 import tech.tablesaw.aggregate.AggregateFunctions.max
 import tech.tablesaw.aggregate.AggregateFunctions.mean
 import tech.tablesaw.aggregate.AggregateFunctions.median
@@ -13,10 +16,15 @@ import tech.tablesaw.api.Row
 import tech.tablesaw.api.StringColumn
 import tech.tablesaw.api.Table
 import tech.tablesaw.columns.Column
+import tech.tablesaw.io.csv.CsvReadOptions
 
 package object dataframe {
-  def readCsv(filename: String) = {
-    Table.read().csv(filename)
+  def readCsv(filename: String, separator: Char = ',', header: Boolean = true): Table = {
+    val optionsBuilder =
+      CsvReadOptions.builder(filename)
+        .separator(separator) // table is tab-delimited
+        .header(header)
+    Table.read().csv(optionsBuilder.build())
   }
 
   def writeCsv(table: Table, filename: String): Unit = {
@@ -24,11 +32,25 @@ package object dataframe {
   }
 
   implicit class DataFrame(df: Table) {
-    def length = df.rowCount
-    def head(n: Int = 5) = df.first(n)
-    def tail(n: Int = 5) = df.last(n)
-    def rows(r: Range) = df.rows(r: _*)
-    def describe() {
+    def length: Int = df.rowCount
+    def head(n: Int = 5): Table = df.first(n)
+    def tail(n: Int = 5): Table = df.last(n)
+    def rows(n: Seq[Int]): Table = df.rows(n: _*)
+    def columns[T: TypeTag](xs: Seq[T]): Table = {
+      import scala.collection.JavaConverters._
+      typeOf[T] match {
+        case t if t =:= typeOf[Int] =>
+          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[Int]]: _*).asScala: _*)
+        case t if t =:= typeOf[String] =>
+          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[String]]: _*).asScala: _*)
+        case _ =>
+          throw new RuntimeException("Invalid column index")
+      }
+    }
+    def rowCols[T: TypeTag](rs: Seq[Int], cs: Seq[T]): Table = {
+      columns(cs).rows(rs)
+    }
+    def describe(): Unit = {
       for (idx <- 0 until df.columnCount) {
         val column = df.column(idx)
         println("===")
