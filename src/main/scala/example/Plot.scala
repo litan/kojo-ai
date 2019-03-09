@@ -3,6 +3,7 @@ package example
 import org.knowm.xchart.SwingWrapper
 
 import net.kogics.kojo.plot._
+import net.kogics.kojo.dataframe._
 
 object Plot {
   def main(args: Array[String]): Unit = {
@@ -13,15 +14,17 @@ object Plot {
     //    val chart = scatterChart("A line chart", "xs", "ys", xs, ys)
     //    addPointsToChart(chart, Some("second line"), xs2, ys2)
 
-    val xs = List("Maruti", "Renault", "Honda")
-    val ys = List(10, 12, 9)
-    //    val chart = barChart("Brand Volume", "Brand", "Volume", xs, ys)
-    val chart = pieChart("Brand Volume", xs, ys)
+    //    val xs = List("Maruti", "Renault", "Honda")
+    //    val ys = List(10, 12, 9)
+    //    //    val chart = barChart("Brand Volume", "Brand", "Volume", xs, ys)
+    //    val chart = pieChart("Brand Volume", xs, ys)
 
     //    val rgen = new util.Random()
     //    val xs = (1 to 1000).map(_ => rgen.nextGaussian).toArray
     //    val chart = histogram("Random normal", "Bins", "Counts", xs, 10)
 
+    val df = readCsv("/home/lalit/work/pandas_for_everyone/data/gapminder.tsv", '\t')
+    val chart = df.columns(Seq("country")).makeChart()
     new SwingWrapper(chart).displayChart()
   }
 }

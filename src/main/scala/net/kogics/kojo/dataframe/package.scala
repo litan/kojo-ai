@@ -3,6 +3,10 @@ package net.kogics.kojo
 import scala.reflect.runtime.universe.TypeTag
 import scala.reflect.runtime.universe.typeOf
 
+import org.knowm.xchart.internal.chartpart.Chart
+import org.knowm.xchart.internal.series.Series
+import org.knowm.xchart.style.Styler
+
 import tech.tablesaw.aggregate.AggregateFunctions.max
 import tech.tablesaw.aggregate.AggregateFunctions.mean
 import tech.tablesaw.aggregate.AggregateFunctions.median
@@ -70,6 +74,28 @@ package object dataframe {
 
           case _ =>
         }
+      }
+    }
+
+    def makeChart[A <: Styler, B <: Series](): Chart[A, B] = {
+      import net.kogics.kojo.plot._
+      val cnt = df.columnCount
+      require(cnt == 1 || cnt == 2, "Frame should have one or two columns")
+      if (cnt == 1) {
+        val column = df.column(0)
+        column match {
+          case nc: NumericColumn[_] =>
+            histogram(nc.name, nc.name, "Count", nc.asDoubleArray(), 20).asInstanceOf[Chart[A, B]]
+          case sc: StringColumn =>
+            val cc = df.categoricalColumn(0)
+            val catcnt = cc.countByCategory
+            barChart(cc.name, cc.name, "Counts", catcnt.stringColumn(0).asObjectArray,
+              catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
+          case _ => null
+        }
+      }
+      else {
+        null
       }
     }
   }
