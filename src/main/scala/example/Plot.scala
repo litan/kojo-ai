@@ -24,7 +24,7 @@ object Plot {
     //    val chart = histogram("Random normal", "Bins", "Counts", xs, 10)
 
     val df = readCsv("/home/lalit/work/pandas_for_everyone/data/gapminder.tsv", '\t')
-    val chart = df.columns(Seq("country")).makeChart()
+    val chart = df.columns(Seq("country")).makePieChart()
     new SwingWrapper(chart).displayChart()
   }
 }

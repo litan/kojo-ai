@@ -86,7 +86,9 @@ package object plot {
       al
     }
 
-    chart.getStyler.setOverlapped(true)
+    chart.getStyler.setOverlapped(false)
+    chart.getStyler.setXAxisDecimalPattern("0")
+    chart.getStyler.setYAxisDecimalPattern("0")
     val histogram = new Histogram(asJavaCollection(xs), bins)
 
     name match {

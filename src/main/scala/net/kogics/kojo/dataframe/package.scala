@@ -77,27 +77,52 @@ package object dataframe {
       }
     }
 
-    def makeChart[A <: Styler, B <: Series](): Chart[A, B] = {
+    def makeBarChart[A <: Styler, B <: Series](): Chart[A, B] = {
       import net.kogics.kojo.plot._
       val cnt = df.columnCount
-      require(cnt == 1 || cnt == 2, "Frame should have one or two columns")
-      if (cnt == 1) {
-        val column = df.column(0)
-        column match {
-          case nc: NumericColumn[_] =>
-            histogram(nc.name, nc.name, "Count", nc.asDoubleArray(), 20).asInstanceOf[Chart[A, B]]
-          case sc: StringColumn =>
-            val cc = df.categoricalColumn(0)
-            val catcnt = cc.countByCategory
-            barChart(cc.name, cc.name, "Counts", catcnt.stringColumn(0).asObjectArray,
-              catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
-          case _ => null
-        }
-      }
-      else {
-        null
-      }
+      require(cnt == 1, "Dataframe should have only one column")
+      val cc = df.categoricalColumn(0)
+      val catcnt = cc.countByCategory
+      barChart(cc.name, cc.name, "Counts", catcnt.stringColumn(0).asObjectArray,
+        catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
     }
+
+    def makePieChart[A <: Styler, B <: Series](): Chart[A, B] = {
+      import net.kogics.kojo.plot._
+      val cnt = df.columnCount
+      require(cnt == 1, "Dataframe should have only one column")
+      val cc = df.categoricalColumn(0)
+      val catcnt = cc.countByCategory
+      pieChart(cc.name, catcnt.stringColumn(0).asObjectArray,
+        catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
+    }
+
+    def makeHistogram[A <: Styler, B <: Series](bins: Int = 10): Chart[A, B] = {
+      import net.kogics.kojo.plot._
+      val cnt = df.columnCount
+      require(cnt == 1, "Dataframe should have only one column")
+      val nc = df.numberColumn(0)
+      histogram(nc.name, nc.name, "Count", nc.asDoubleArray(), bins).asInstanceOf[Chart[A, B]]
+    }
+
+    def makeLineChart[A <: Styler, B <: Series](): Chart[A, B] = {
+      import net.kogics.kojo.plot._
+      val cnt = df.columnCount
+      require(cnt == 2, "Dataframe should have two columns")
+      val nc1 = df.numberColumn(0)
+      val nc2 = df.numberColumn(1)
+      lineChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+    }
+
+    def makeScatterChart[A <: Styler, B <: Series](): Chart[A, B] = {
+      import net.kogics.kojo.plot._
+      val cnt = df.columnCount
+      require(cnt == 2, "Dataframe should have two columns")
+      val nc1 = df.numberColumn(0)
+      val nc2 = df.numberColumn(1)
+      scatterChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+    }
+
   }
 
   trait ColumnAdder[A] {

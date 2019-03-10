@@ -26,7 +26,22 @@ def drawChart[A <: Styler, B <: Series](chart: Chart[A, B]) {
     draw(pic)
 }
 
+def barChart(t: Table) {
+    drawChart(t.makeBarChart())
+}
 
-def plot(t: Table) {
-    drawChart(t.makeChart())
+def pieChart(t: Table) {
+    drawChart(t.makePieChart())
+}
+
+def histogram(t: Table, bins: Int = 10) {
+    drawChart(t.makeHistogram(bins))
+}
+
+def lineChart(t: Table) {
+    drawChart(t.makeLineChart())
+}
+
+def scatterChart(t: Table) {
+    drawChart(t.makeScatterChart())
 }
