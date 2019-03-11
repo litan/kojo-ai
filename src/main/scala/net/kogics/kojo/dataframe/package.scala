@@ -14,6 +14,8 @@ import tech.tablesaw.aggregate.AggregateFunctions.min
 import tech.tablesaw.aggregate.AggregateFunctions.quartile1
 import tech.tablesaw.aggregate.AggregateFunctions.quartile3
 import tech.tablesaw.aggregate.AggregateFunctions.standardDeviation
+import tech.tablesaw.api.CategoricalColumn
+import tech.tablesaw.api.DoubleColumn
 import tech.tablesaw.api.IntColumn
 import tech.tablesaw.api.NumericColumn
 import tech.tablesaw.api.Row
@@ -33,6 +35,17 @@ package object dataframe {
 
   def writeCsv(table: Table, filename: String): Unit = {
     table.write().csv(filename)
+  }
+
+  implicit class RichCategoricalColumn[T](c: CategoricalColumn[T]) {
+    def percentByCategory() = {
+      val catcnt = c.countByCategory
+      val cats = catcnt.stringColumn(0)
+      val cnts = catcnt.intColumn(1).asDoubleArray()
+      val total = cnts.sum
+      val percents = DoubleColumn.create("Percent", cnts.map(_ * 100 / total))
+      Table.create(c.name, cats, percents)
+    }
   }
 
   implicit class DataFrame(df: Table) {
@@ -83,7 +96,7 @@ package object dataframe {
       require(cnt == 1, "Dataframe should have only one column")
       val cc = df.categoricalColumn(0)
       val catcnt = cc.countByCategory
-      barChart(cc.name, cc.name, "Counts", catcnt.stringColumn(0).asObjectArray,
+      barChart(" ", cc.name, "Percent", catcnt.stringColumn(0).asObjectArray,
         catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
     }
 
