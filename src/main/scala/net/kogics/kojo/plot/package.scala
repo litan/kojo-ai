@@ -54,7 +54,7 @@ package object plot {
     }
   }
 
-  private def addCategorySeriesToChart(chart: CategoryChart, name: Option[String], categories: Seq[String], counts: Seq[Int]): CategorySeries = {
+  private def addCategorySeriesToChart[N <: Number](chart: CategoryChart, name: Option[String], categories: Seq[String], values: Seq[N]): CategorySeries = {
     def asJavaList[A, B](xs: Seq[B]) = {
       import scala.collection.JavaConverters._
       xs.asJava.asInstanceOf[java.util.List[A]]
@@ -63,10 +63,10 @@ package object plot {
     name match {
       case Some(name) =>
         chart.getStyler.setLegendVisible(true)
-        chart.addSeries(name, asJavaList(categories), asJavaList(counts))
+        chart.addSeries(name, asJavaList(categories), asJavaList(values))
       case None =>
         chart.getStyler.setLegendVisible(false)
-        chart.addSeries("default", asJavaList(categories), asJavaList(counts))
+        chart.addSeries("default", asJavaList(categories), asJavaList(values))
     }
   }
 
@@ -113,8 +113,8 @@ package object plot {
     chart
   }
 
-  def addBarsToChart(chart: CategoryChart, name: Option[String], categories: Seq[String], counts: Seq[Int]): CategoryChart = {
-    val series = addCategorySeriesToChart(chart, name, categories, counts)
+  def addBarsToChart[N <: Number](chart: CategoryChart, name: Option[String], categories: Seq[String], values: Seq[N]): CategoryChart = {
+    val series = addCategorySeriesToChart(chart, name, categories, values)
     //    series.setLineColor()
     chart
   }
@@ -146,7 +146,8 @@ package object plot {
   def barChart(title: String, xtitle: String, ytitle: String,
                categories: Seq[String], counts: Seq[Int]): CategoryChart = {
     val chart = makeCategoryChart(title, xtitle, ytitle)
-    addBarsToChart(chart, None, categories, counts)
+    val total = counts.sum
+    addBarsToChart(chart, None, categories, counts.map(e => new java.lang.Double(e * 100.0 / total)))
   }
 
   def pieChart(title: String, categories: Seq[String], counts: Seq[Int]): PieChart = {
