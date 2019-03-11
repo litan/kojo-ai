@@ -17,7 +17,7 @@ import org.knowm.xchart.style.Styler.ChartTheme
 package object plot {
   private def makeXYChart(title: String, xtitle: String, ytitle: String): XYChart = {
     val chart = new XYChartBuilder().width(800).height(600).title(title).
-      xAxisTitle(xtitle).yAxisTitle(ytitle).build()
+      xAxisTitle(xtitle).yAxisTitle(ytitle).theme(ChartTheme.GGPlot2).build()
     chart.getStyler.setDefaultSeriesRenderStyle(XYSeriesRenderStyle.Scatter)
     chart.getStyler.setChartTitleVisible(true)
     chart.getStyler.setAxisTitlesVisible(true)

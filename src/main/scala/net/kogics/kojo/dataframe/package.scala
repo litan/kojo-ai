@@ -108,19 +108,37 @@ package object dataframe {
     def makeLineChart[A <: Styler, B <: Series](): Chart[A, B] = {
       import net.kogics.kojo.plot._
       val cnt = df.columnCount
-      require(cnt == 2, "Dataframe should have two columns")
-      val nc1 = df.numberColumn(0)
-      val nc2 = df.numberColumn(1)
-      lineChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+      require(cnt == 1 || cnt == 2, "Dataframe should have one or two columns")
+      if (cnt == 1) {
+        val nc2 = df.numberColumn(0)
+        val chart = lineChart(" ", " ", nc2.name, Array.tabulate(10)(e => (e + 1).toDouble), nc2.asDoubleArray)
+        chart.getStyler.setXAxisDecimalPattern("0")
+        chart.getStyler.setXAxisMin(1.0)
+        chart.asInstanceOf[Chart[A, B]]
+      }
+      else {
+        val nc1 = df.numberColumn(0)
+        val nc2 = df.numberColumn(1)
+        lineChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+      }
     }
 
     def makeScatterChart[A <: Styler, B <: Series](): Chart[A, B] = {
       import net.kogics.kojo.plot._
       val cnt = df.columnCount
-      require(cnt == 2, "Dataframe should have two columns")
-      val nc1 = df.numberColumn(0)
-      val nc2 = df.numberColumn(1)
-      scatterChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+      require(cnt == 1 || cnt == 2, "Dataframe should have one or two columns")
+      if (cnt == 1) {
+        val nc2 = df.numberColumn(0)
+        val chart = scatterChart(" ", " ", nc2.name, Array.tabulate(10)(e => (e + 1).toDouble), nc2.asDoubleArray)
+        chart.getStyler.setXAxisDecimalPattern("0")
+        chart.getStyler.setXAxisMin(1.0)
+        chart.asInstanceOf[Chart[A, B]]
+      }
+      else {
+        val nc1 = df.numberColumn(0)
+        val nc2 = df.numberColumn(1)
+        scatterChart(" ", nc1.name, nc2.name, nc1.asDoubleArray, nc2.asDoubleArray).asInstanceOf[Chart[A, B]]
+      }
     }
 
   }

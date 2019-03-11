@@ -29,5 +29,10 @@ object Dataframe {
     df.xTabCounts("Topic", "Class")
     // frequencies for categorical var
     df.categoricalColumn("Class").countByCategory
+
+    val marks = readCsv("/home/lalit/work/kojo-ai/data/student-marks.csv")
+    val info = readCsv("/home/lalit/work/kojo-ai/data/student-info.csv")
+    marks.join("Name").inner(info)
+    marks.columns(Seq("Math")).makeLineChart()
   }
 }

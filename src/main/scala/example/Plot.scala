@@ -23,8 +23,13 @@ object Plot {
     //    val xs = (1 to 1000).map(_ => rgen.nextGaussian).toArray
     //    val chart = histogram("Random normal", "Bins", "Counts", xs, 10)
 
-    val df = readCsv("/home/lalit/work/pandas_for_everyone/data/gapminder.tsv", '\t')
-    val chart = df.columns(Seq("country")).makePieChart()
+//    val df = readCsv("/home/lalit/work/pandas_for_everyone/data/gapminder.tsv", '\t')
+//    val chart = df.columns(Seq("country")).makePieChart()
+
+    val marks = readCsv("/home/lalit/work/kojo-ai/data/student-marks.csv")
+    val info = readCsv("/home/lalit/work/kojo-ai/data/student-info.csv")
+    val chart = marks.columns(Seq("Math")).makeLineChart()
+
     new SwingWrapper(chart).displayChart()
   }
 }
