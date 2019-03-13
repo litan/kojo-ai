@@ -9,7 +9,8 @@ Support for data science, machine learning, and more - within Kojo
 Kojo-AI aims to provide an integrated high-level API/DSL sitting over the (lower level) libraries mentioned above.
 
 ### Upcoming Features:
-* Search
+* Reinforcement learning (for games and robots)
+* Search algorithms
 * Constraint Satisfaction
 * Constraint Logic Programming
 * Genetic Algorithms
