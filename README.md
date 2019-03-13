@@ -1,12 +1,14 @@
 # Kojo-AI
 Support for data science, machine learning, and more - within Kojo
 
-Current Features (work in progress, but functional):
+### Current Features (work in progress, but functional):
 * Data Frames (via Tablesaw)
 * Plotting (via XCharts)
 * Neural Networks (via Tensorflow)
 
-Upcoming:
+Kojo-AI aims to provide an integrated high-level API/DSL sitting over the (lower level) libraries mentioned above.
+
+### Upcoming Features:
 * Search
 * Constraint Satisfaction
 * Constraint Logic Programming
