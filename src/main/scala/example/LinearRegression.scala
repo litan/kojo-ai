@@ -18,7 +18,7 @@ object LinearRegression {
 
     val chart = scatterChart("Regression Data", "X", "Y", xData0, yData0)
     chart.getStyler.setLegendVisible(true)
-    new SwingWrapper(chart).displayChart()
+    val chartWin = new SwingWrapper(chart).displayChart()
 
     val xData = normalizer.fitTransform(xData0)
     val yData = yData0
@@ -29,6 +29,7 @@ object LinearRegression {
     model.fit(xData, yData, 1000)
     val yPreds = model.evaluate(xData)
     addLineToChart(chart, Some("model"), xData0, yPreds)
+    chartWin.repaint()
     model.close()
   }
 }

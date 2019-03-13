@@ -22,7 +22,7 @@ object NonLinearRegression {
 
     val chart = scatterChart("Regression Data", "X", "Y", xData0, yData0)
     chart.getStyler.setLegendVisible(true)
-    new SwingWrapper(chart).displayChart()
+    val chartWin = new SwingWrapper(chart).displayChart()
 
     val xData = xNormalizer.fitTransform(xData0)
     val yData = yNormalizer.fitTransform(yData0)
@@ -37,6 +37,7 @@ object NonLinearRegression {
     model.fit(xData, yData, 3000)
     val yPreds = model.evaluate(xData)
     addLineToChart(chart, Some("model"), xData0, yNormalizer.inverseTransform(yPreds))
+    chartWin.repaint()
     model.close()
   }
 }
