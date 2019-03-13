@@ -3,7 +3,7 @@ Support for data science, machine learning, and more - within Kojo
 
 Current Features (work in progress, but functional):
 * Data Frames (via Tablesaw)
-* Plotting (via XCharts
+* Plotting (via XCharts)
 * Neural Networks (via Tensorflow)
 
 Upcoming:
