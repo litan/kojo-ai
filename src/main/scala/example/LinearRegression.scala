@@ -25,7 +25,8 @@ object LinearRegression {
 
     val model = Sequential(Dense(1))
 
-    model.compile(mse, tf.train.GradientDescent(0.1f))
+    model.compile(mse, tf.train.GradientDescent(0.1f), shape(-1, 1), shape(-1, 1))
+    model.describe()
     model.fit(xData, yData, 1000)
     val yPreds = model.evaluate(xData)
     addLineToChart(chart, Some("model"), xData0, yPreds)

@@ -33,7 +33,8 @@ object NonLinearRegression {
       Dense(1)
     )
 
-    model.compile(mse, tf.train.Adam())
+    model.compile(mse, tf.train.Adam(), shape(-1, 1), shape(-1, 1))
+    model.describe()
     model.fit(xData, yData, 3000)
     val yPreds = model.evaluate(xData)
     addLineToChart(chart, Some("model"), xData0, yNormalizer.inverseTransform(yPreds))

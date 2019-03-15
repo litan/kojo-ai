@@ -42,11 +42,11 @@ package object nn {
     //    def apply(input: Double)(implicit mode: Mode): Output[Double]
   }
 
+  def shape(dims: Int*) = Shape(dims: _*)
+
   case class Sequential(layers: Layer*) {
     var X: Output[Double] = _
     var Y: Output[Double] = _
-    var model: Layer0[Output[Double], Output[Double]] = _
-
     var trainPreds: Output[Double] = _
     var evalPreds: Output[Double] = _
     var inferencePreds: Output[Double] = _
@@ -56,18 +56,25 @@ package object nn {
     var graph: Graph = _
     var session: Session = _
 
-    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer) {
+    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer, inputShape: Shape, outputShape: Shape) {
+      def forward(layers: Seq[Layer], input: Output[Double])(implicit mode: Mode): Output[Double] = {
+        var output = input
+        layers.foreach { layer =>
+          output = layer.impl(output)
+        }
+        output
+      }
+
       graph = Graph()
       tf.createWith(graph = graph) {
-        X = tf.placeholder[Double](Shape(-1, 1), "X")
-        Y = tf.placeholder[Double](Shape(-1, 1), "Y")
-        model = layers.tail.foldLeft(layers.head.impl)((l1, l2) => l1 >> l2.impl)
-        trainPreds = model(X)(tf.learn.TRAINING)
+        X = tf.placeholder[Double](inputShape, "X")
+        Y = tf.placeholder[Double](outputShape, "Y")
+        trainPreds = forward(layers, X)(tf.learn.TRAINING)
         loss = lossFn(Y - trainPreds)
         trainStep = optimizer.minimize(loss)
 
-        evalPreds = model(X)(tf.learn.EVALUATION)
-        inferencePreds = model(X)(tf.learn.INFERENCE)
+        evalPreds = forward(layers, X)(tf.learn.EVALUATION)
+        inferencePreds = forward(layers, X)(tf.learn.INFERENCE)
       }
     }
 
