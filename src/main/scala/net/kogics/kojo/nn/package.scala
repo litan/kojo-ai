@@ -39,7 +39,7 @@ package object nn {
 
   trait Layer {
     def impl: Layer0[Output[Double], Output[Double]]
-    def apply(input: Double)(implicit mode: Mode): Output[Double]
+    //    def apply(input: Double)(implicit mode: Mode): Output[Double]
   }
 
   case class Sequential(layers: Layer*) {
@@ -108,6 +108,26 @@ package object nn {
       session.close()
       graph.close()
     }
+
+    def describe(): Unit = {
+      val graph = Graph()
+      tf.createWith(graph = graph) {
+        val X = tf.placeholder[Double](Shape(-1, 1), "X")
+        var layerInput = X // Tensor.randn(FLOAT64, X.shape)
+        println(layerInput.shape)
+        layers.foreach { layer =>
+          val output = layer.impl(layerInput)(tf.learn.TRAINING)
+          println(s"\n* Layer: ${layer.impl.name} -- ${output.shape}")
+          val params = graph.trainableVariables.filter(_.name startsWith layer.impl.name)
+          println("params:")
+          params.foreach { p =>
+            println(s"${p.name} - ${p.shape}")
+          }
+          layerInput = output
+        }
+      }
+      graph.close()
+    }
   }
 
   object Counter {
@@ -121,11 +141,11 @@ package object nn {
 
   case class Dense(n: Int) extends Layer {
     val impl = tf.learn.Linear[Double](s"Dense${Counter.getAndIncr}", n)
-    def apply(input: Double)(implicit mode: Mode) = impl(input)
+    //    def apply(input: Double)(implicit mode: Mode) = impl(input)
   }
 
   case class LeakyRelu(alpha: Double) extends Layer {
     val impl = tf.learn.ReLU[Double](s"Relu${Counter.getAndIncr}", alpha.toFloat)
-    def apply(input: Double)(implicit mode: Mode) = impl(input)
+    //    def apply(input: Double)(implicit mode: Mode) = impl(input)
   }
 }
