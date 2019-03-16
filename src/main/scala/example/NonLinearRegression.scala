@@ -28,14 +28,16 @@ object NonLinearRegression {
     val yData = yNormalizer.fitTransform(yData0)
 
     val model = Sequential(
+      Input(-1, 1),
       Dense(64), LeakyRelu(0.1),
+      Dropout(0.95),
       Dense(32), LeakyRelu(0.1),
       Dense(1)
     )
 
-    model.compile(mse, tf.train.Adam(), shape(-1, 1), shape(-1, 1))
+    model.compile(mse, tf.train.Adam())
     model.describe()
-    model.fit(xData, yData, 3000)
+    model.fit(xData, yData, 6000)
     val yPreds = model.evaluate(xData)
     addLineToChart(chart, Some("model"), xData0, yNormalizer.inverseTransform(yPreds))
     chartWin.repaint()

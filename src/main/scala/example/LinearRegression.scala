@@ -23,9 +23,9 @@ object LinearRegression {
     val xData = normalizer.fitTransform(xData0)
     val yData = yData0
 
-    val model = Sequential(Dense(1))
+    val model = Sequential(Input(-1, 1), Dense(1))
 
-    model.compile(mse, tf.train.GradientDescent(0.1f), shape(-1, 1), shape(-1, 1))
+    model.compile(mse, tf.train.GradientDescent(0.1f))
     model.describe()
     model.fit(xData, yData, 1000)
     val yPreds = model.evaluate(xData)

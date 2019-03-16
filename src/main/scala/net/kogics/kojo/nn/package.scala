@@ -39,14 +39,42 @@ package object nn {
 
   trait Layer {
     def impl: Layer0[Output[Double], Output[Double]]
-    //    def apply(input: Double)(implicit mode: Mode): Output[Double]
+  }
+
+  object Counter {
+    var counter = 1
+    def getAndIncr = {
+      val ret = counter
+      counter += 1
+      ret
+    }
   }
 
   def shape(dims: Int*) = Shape(dims: _*)
 
-  case class Sequential(layers: Layer*) {
-    var X: Output[Double] = _
-    var Y: Output[Double] = _
+  case class Input(dims: Int*) {
+    lazy val placeholder = tf.placeholder[Double](shape(dims: _*), "Input")
+  }
+
+  case class Dense(n: Int) extends Layer {
+    lazy val impl = tf.learn.Linear[Double](s"Dense${Counter.getAndIncr}", n)
+  }
+
+  case class LeakyRelu(alpha: Double) extends Layer {
+    lazy val impl = tf.learn.ReLU[Double](s"Relu${Counter.getAndIncr}", alpha.toFloat)
+  }
+
+  case object Sigmoid extends Layer {
+    lazy val impl = tf.learn.Sigmoid(s"Sigmoid${Counter.getAndIncr}")
+  }
+
+  case class Dropout(keep: Double) extends Layer {
+    lazy val impl = tf.learn.Dropout[Double](s"Dropout${Counter.getAndIncr}", keep.toFloat)
+  }
+
+  case class Sequential(in: Input, layers: Layer*) {
+    var input: Output[Double] = _
+    var target: Output[Double] = _
     var trainPreds: Output[Double] = _
     var evalPreds: Output[Double] = _
     var inferencePreds: Output[Double] = _
@@ -56,7 +84,7 @@ package object nn {
     var graph: Graph = _
     var session: Session = _
 
-    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer, inputShape: Shape, outputShape: Shape) {
+    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer) {
       def forward(layers: Seq[Layer], input: Output[Double])(implicit mode: Mode): Output[Double] = {
         var output = input
         layers.foreach { layer =>
@@ -67,14 +95,15 @@ package object nn {
 
       graph = Graph()
       tf.createWith(graph = graph) {
-        X = tf.placeholder[Double](inputShape, "X")
-        Y = tf.placeholder[Double](outputShape, "Y")
-        trainPreds = forward(layers, X)(tf.learn.TRAINING)
-        loss = lossFn(Y - trainPreds)
+        input = in.placeholder
+        trainPreds = forward(layers, input)(tf.learn.TRAINING)
+        target = tf.placeholder[Double](trainPreds.shape, "Target")
+
+        loss = lossFn(target - trainPreds)
         trainStep = optimizer.minimize(loss)
 
-        evalPreds = forward(layers, X)(tf.learn.EVALUATION)
-        inferencePreds = forward(layers, X)(tf.learn.INFERENCE)
+        evalPreds = forward(layers, input)(tf.learn.EVALUATION)
+        inferencePreds = forward(layers, input)(tf.learn.INFERENCE)
       }
     }
 
@@ -86,7 +115,7 @@ package object nn {
         session = Session()
         session.run(targets = Seq(tf.globalVariablesInitializer()))
         for (epoch <- 1 to epochs) {
-          var feedmap = Map(X -> xf, Y -> yf)
+          var feedmap = Map(input -> xf, target -> yf)
           session.run(targets = Seq(trainStep), feeds = feedmap)
           val outs = session.run(fetches = Seq(loss), feeds = feedmap)
           val lossO = outs(0)
@@ -98,7 +127,7 @@ package object nn {
     def evaluate(xData: Array[Double]): Array[Double] = {
       val xf = toDoubleTensor(xData)
       tf.createWith(graph = graph) {
-        val outs = session.run(fetches = Seq(evalPreds), feeds = Map(X -> xf))
+        val outs = session.run(fetches = Seq(evalPreds), feeds = Map(input -> xf))
         outs(0).toArray
       }
     }
@@ -106,7 +135,7 @@ package object nn {
     def predict(xData: Array[Double]): Array[Double] = {
       val xf = toDoubleTensor(xData)
       tf.createWith(graph = graph) {
-        val outs = session.run(fetches = Seq(inferencePreds), feeds = Map(X -> xf))
+        val outs = session.run(fetches = Seq(inferencePreds), feeds = Map(input -> xf))
         outs(0).toArray
       }
     }
@@ -135,24 +164,5 @@ package object nn {
       }
       graph.close()
     }
-  }
-
-  object Counter {
-    var counter = 1
-    def getAndIncr = {
-      val ret = counter
-      counter += 1
-      ret
-    }
-  }
-
-  case class Dense(n: Int) extends Layer {
-    val impl = tf.learn.Linear[Double](s"Dense${Counter.getAndIncr}", n)
-    //    def apply(input: Double)(implicit mode: Mode) = impl(input)
-  }
-
-  case class LeakyRelu(alpha: Double) extends Layer {
-    val impl = tf.learn.ReLU[Double](s"Relu${Counter.getAndIncr}", alpha.toFloat)
-    //    def apply(input: Double)(implicit mode: Mode) = impl(input)
   }
 }
