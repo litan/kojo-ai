@@ -27,12 +27,12 @@ object NonLinearRegression {
     val xData = xNormalizer.fitTransform(xData0)
     val yData = yNormalizer.fitTransform(yData0)
 
+    val l2Factor = 0.005
     val model = Sequential(
       Input(-1, 1),
-      Dense(64), LeakyRelu(0.1),
-      Dropout(0.95),
-      Dense(32), LeakyRelu(0.1),
-      Dense(1)
+      Dense(64, wRegulariser = Some(l2(l2Factor))), LeakyRelu(0.1),
+      Dense(32, wRegulariser = Some(l2(l2Factor))), LeakyRelu(0.1),
+      Dense(1, wRegulariser = Some(l2(l2Factor)))
     )
 
     model.compile(mse, tf.train.Adam())
