@@ -39,7 +39,7 @@ package object nn {
   }
 
   val mse = (x: Output[Double]) => tf.mean(tf.square(x))
-  def l2(factor: Double)(p: Output[Double]) = factor * l2Loss[Double](p, "L2Loss")
+  def l2(factor: Double)(p: Output[Double]): Output[Double] = factor * l2Loss[Double](p, "L2Loss")
 
   trait Layer {
     def impl: Layer0[Output[Double], Output[Double]]
@@ -68,7 +68,7 @@ package object nn {
     val impl = tf.learn.Linear[Double](s"Dense${Counter.getAndIncr}", n)
     override def paramLoss(graph: Graph) = {
       wRegulariser match {
-        case Some(reg) => parameters(graph).map(p => reg(p)).toSeq
+        case Some(reg) => parameters(graph).filter(_.name.endsWith("/Weights")).map(p => reg(p)).toSeq
         case None      => Nil
       }
     }

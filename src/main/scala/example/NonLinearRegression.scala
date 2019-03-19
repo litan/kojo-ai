@@ -15,7 +15,7 @@ object NonLinearRegression {
     val b = 3
     val c = 10
     val xData0 = Array.tabulate(20)(e => (e + 1).toDouble)
-    val yData0 = xData0 map (x => a * x * x + b * x + c + math.random * 30 - 15)
+    val yData0 = xData0 map (x => a * x * x + b * x + c + math.random * 40 - 20)
 
     val xNormalizer = new StandardScaler()
     val yNormalizer = new MaxAbsScaler()
@@ -27,12 +27,12 @@ object NonLinearRegression {
     val xData = xNormalizer.fitTransform(xData0)
     val yData = yNormalizer.fitTransform(yData0)
 
-    val l2Factor = 0.005
+    val wReg = Some(l2(0.005)(_))
     val model = Sequential(
       Input(-1, 1),
-      Dense(64, wRegulariser = Some(l2(l2Factor))), LeakyRelu(0.1),
-      Dense(32, wRegulariser = Some(l2(l2Factor))), LeakyRelu(0.1),
-      Dense(1, wRegulariser = Some(l2(l2Factor)))
+      Dense(8, wReg), LeakyRelu(0.1),
+      Dense(8, wReg), LeakyRelu(0.1),
+      Dense(1, wReg)
     )
 
     model.compile(mse, tf.train.Adam())
