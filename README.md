@@ -7,8 +7,6 @@ Support for data science, machine learning, and more - within Kojo
 * Neural Networks (via Tensorflow)
 * Graphs (Bfs, Dfs, A* search, etc)
 
-Kojo-AI aims to provide an integrated high-level API/DSL sitting over the (lower level) libraries mentioned above.
-
 ### Upcoming Features:
 * Reinforcement learning (for games and robots)
 * Search algorithms
