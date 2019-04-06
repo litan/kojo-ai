@@ -5,6 +5,7 @@ Support for data science, machine learning, and more - within Kojo
 * Data Frames (via Tablesaw)
 * Plotting (via XCharts)
 * Neural Networks (via Tensorflow)
+* Graphs (Bfs, Dfs, A* search, etc)
 
 Kojo-AI aims to provide an integrated high-level API/DSL sitting over the (lower level) libraries mentioned above.
 
