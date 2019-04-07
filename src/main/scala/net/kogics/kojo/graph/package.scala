@@ -48,7 +48,7 @@ package object graph {
     def hasElements = !impl.isEmpty
   }
 
-  case class Node[T](t: T)
+  case class Node[T](data: T)
   case class EdgeTo[T](node: Node[T], distance: Double = 1)
 
   type GraphEdges[T] = MMap[Node[T], MSet[EdgeTo[T]]]
@@ -57,6 +57,7 @@ package object graph {
   type ContainerElem[T] = (Node[T], PathEdges[T])
 
   trait Graph[T] {
+    def nodes: Nodes[T]
     def edges: GraphEdges[T]
   }
 
