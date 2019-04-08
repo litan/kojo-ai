@@ -1,11 +1,13 @@
 # Kojo-AI
-Support for data science, machine learning, and more - within Kojo
+Support for data science, machine learning, and more - within Kojo.
 
 ### Current Features (work in progress, but functional):
 * Data Frames (via Tablesaw)
 * Plotting (via XCharts)
 * Neural Networks (via Tensorflow)
 * Graphs (Bfs, Dfs, A* search, etc)
+
+A lot of this stuff works best with the upcoming Kojo 2.7.05, which has a Data Exploration pane to enable interactive data analysis, algorithm exploration, and more...
 
 ### Upcoming Features:
 * Reinforcement learning (for games and robots)
