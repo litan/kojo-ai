@@ -19,14 +19,14 @@ import scala.collection.mutable.{Set => MSet}
 
 package object graph {
   trait Container[T] {
-    def add(t: T): Unit
+    def add(t: T, cost: Double = 0): Unit
     def remove(): T
     def hasElements: Boolean
   }
 
   class Stack[T] extends Container[T] {
     var impl: List[T] = Nil
-    def add(t: T) {
+    def add(t: T, cost: Double = 0) {
       impl = t :: impl
     }
     def remove(): T = {
@@ -39,11 +39,31 @@ package object graph {
 
   class Queue[T] extends Container[T] {
     val impl = collection.mutable.Queue.empty[T]
-    def add(t: T) {
+    def add(t: T, cost: Double = 0) {
       impl.enqueue(t)
     }
     def remove(): T = {
       impl.dequeue
+    }
+    def hasElements = !impl.isEmpty
+  }
+
+  class PriorityQueue[T] extends Container[T] {
+    case class TwithCost(t: T, cost: Double)
+    implicit val TwithCostOrdering = new Ordering[TwithCost] {
+      override def compare(x: TwithCost, y: TwithCost): Int = {
+        -x.cost compare -y.cost
+      }
+    }
+    val impl = collection.mutable.PriorityQueue.empty[TwithCost]
+    def add(t: T, cost: Double) {
+      //      println(s"adding: $t with cost $cost")
+      impl.enqueue(TwithCost(t, cost))
+    }
+    def remove(): T = {
+      val head = impl.dequeue
+      //      println(s"removing: ${head.t} with cost ${head.cost}")
+      head.t
     }
     def hasElements = !impl.isEmpty
   }
@@ -64,22 +84,45 @@ package object graph {
   case class ExplicitGraph[T](nodes: Nodes[T], edges: GraphEdges[T]) extends Graph[T]
 
   object GraphSearch {
+    type CostFn[T] = (PathEdges[T], Node[T]) => Double
+    type HeuristicFn[T] = (Node[T], Node[T]) => Double
+
     def noOpCallback[T](n: Node[T]) {}
     def dfs[T](graph: Graph[T], start: Node[T], end: Node[T],
                visitCallback: Node[T] => Unit = noOpCallback _): Option[PathEdges[T]] = {
+      def cost(pathEdges: PathEdges[T], end: Node[T]): Double = 0
       val container = new Stack[ContainerElem[T]]
-      search(graph, start, end, container, visitCallback)
+      searchWithCost(graph, start, end, container, visitCallback, cost)
     }
 
     def bfs[T](graph: Graph[T], start: Node[T], end: Node[T],
                visitCallback: Node[T] => Unit = noOpCallback _): Option[PathEdges[T]] = {
+      def cost(pathEdges: PathEdges[T], end: Node[T]): Double = 0
       val container = new Queue[ContainerElem[T]]
-      search(graph, start, end, container, visitCallback)
+      searchWithCost(graph, start, end, container, visitCallback, cost)
     }
 
-    def search[T](graph: Graph[T], start: Node[T], end: Node[T],
-                  container:     Container[ContainerElem[T]],
-                  visitCallback: Node[T] => Unit): Option[PathEdges[T]] = {
+    private def pathDistance[T](pathEdges: PathEdges[T]): Double = pathEdges.foldLeft(0.0) { case (d, e) => d + e.distance }
+
+    def ucs[T](graph: Graph[T], start: Node[T], end: Node[T],
+               visitCallback: Node[T] => Unit = noOpCallback _): Option[PathEdges[T]] = {
+      def cost(pathEdges: PathEdges[T], end: Node[T]): Double = pathDistance(pathEdges)
+      val container = new PriorityQueue[ContainerElem[T]]
+      searchWithCost(graph, start, end, container, visitCallback, cost)
+    }
+
+    def astarSearch[T](graph: Graph[T], start: Node[T], end: Node[T],
+                       visitCallback: Node[T] => Unit = noOpCallback _,
+                       heuristic:     HeuristicFn[T]): Option[PathEdges[T]] = {
+      def cost(pathEdges: PathEdges[T], end: Node[T]): Double = pathDistance(pathEdges) + heuristic(pathEdges.last.node, end)
+      val container = new PriorityQueue[ContainerElem[T]]
+      searchWithCost(graph, start, end, container, visitCallback, cost)
+    }
+
+    def searchWithCost[T](graph: Graph[T], start: Node[T], end: Node[T],
+                          container:     Container[ContainerElem[T]],
+                          visitCallback: Node[T] => Unit,
+                          costFn:        CostFn[T]): Option[PathEdges[T]] = {
       if (start == end) {
         Some(ArrayBuffer())
       }
@@ -98,7 +141,8 @@ package object graph {
             }
             else {
               graph.edges(elem._1).foreach { edgeTo =>
-                container.add((edgeTo.node, elemPath :+ edgeTo))
+                val newPath = elemPath :+ edgeTo
+                container.add((edgeTo.node, newPath), costFn(newPath, end))
               }
             }
           }
