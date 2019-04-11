@@ -61,10 +61,11 @@ def visitCallback(n: GraphNode) {
     val pos = n.data
     val cell = gridPoints(pos.x)(pos.y)
     val pic = cell.pic
-    val vpic = Picture.circle(10)
+    val vpic = Picture.circle(15)
     vpic.setPosition(pic.position)
     vpic.setPenColor(visitedColor)
     vpic.setFillColor(visitedColor)
+    vpic.moveToBack()
     draw(vpic)
     visitedPics += vpic
     pause(1)
@@ -89,7 +90,7 @@ def drawPath(start: Node[GridPos], path: Option[PathEdges[GridPos]]) {
     def drawEdgeBetweenPos(gridPos1: GridPos, gridPos2: GridPos) {
         val cell1 = gridPoints(gridPos1.x)(gridPos1.y)
         val cell2 = gridPoints(gridPos2.x)(gridPos2.y)
-        val edge = makeAndDrawEdge(cell1, cell2, white, 8, false)
+        val edge = makeAndDrawEdge(cell1, cell2, white, 8, true)
         pathPics += edge
     }
 
@@ -177,8 +178,7 @@ repeatFor(0 to n - 1) { nx =>
     }
 }
 
-def loadGraph(g: Graph[GridPos]) {
-    val gnodes = g.nodes
+def loadNodesAndEdges(gnodes: Nodes[GridPos], gedges: GraphEdges[GridPos]) {
     gnodes.foreach { node =>
         val pos = node.data
         val cell = gridPoints(pos.x)(pos.y)
@@ -188,8 +188,7 @@ def loadGraph(g: Graph[GridPos]) {
         pic.setPenColor(nodeCellColor)
         pic.setFillColor(nodeCellColor)
     }
-    val edges = g.edges
-    edges.foreach {
+    gedges.foreach {
         case (node, adjSet) =>
             val pos = node.data
             val cell1 = gridPoints(pos.x)(pos.y)
@@ -199,6 +198,11 @@ def loadGraph(g: Graph[GridPos]) {
                 addEdge(cell1, cell2)
             }
     }
+}
+
+def eraseSearch() {
+    eraseVisits()
+    erasePath()
 }
 
 val gEdges: MMap[GraphNode, MSet[EdgeTo[GridPos]]] = HashMap(
@@ -221,12 +225,25 @@ val gNodes = HashSet(
     Node(GridPos(0, 0)), Node(GridPos(2, 0)), Node(GridPos(3, 2))
 )
 
-val g = ExplicitGraph(gNodes, gEdges)
-
-loadGraph(g)
+loadNodesAndEdges(gNodes, gEdges)
+val g = ExplicitGraph(nodes, edges)
 val start = Node(GridPos(0, 0))
-// val path = GraphSearch.dfs(g, start, Node(GridPos(9, 9)), visitCallback)
-// val path = GraphSearch.bfs(g, start, Node(GridPos(9, 9)), visitCallback)
-// val path = GraphSearch.ucs(g, start, Node(GridPos(9, 9)), visitCallback)
-val path = GraphSearch.astarSearch(g, start, Node(GridPos(9, 9)), visitCallback, distance)
-drawPath(start, path)
+val end = Node(GridPos(9, 9))
+
+def search(algo: String) {
+    val path = algo match {
+        case "dfs" => GraphSearch.dfs(g, start, end, visitCallback)
+        case "bfs" => GraphSearch.bfs(g, start, end, visitCallback)
+        case "ucs" => GraphSearch.ucs(g, start, end, visitCallback)
+        case "astar" =>
+            GraphSearch.astarSearch(g, start, end, visitCallback, distance)
+    }
+    drawPath(start, path)
+}
+
+def redoSearch(algo: String) {
+    eraseSearch()
+    search(algo)
+}
+
+search("astar")
