@@ -25,3 +25,4 @@ Then (re)start Kojo to start using Kojo-AI.
 
 A blog post with examples will be available soon. In the meantime here are some (raw) examples:  
 https://github.com/litan/kojo-ai/tree/master/src/main/scala/example
+https://github.com/litan/kojo-ai/tree/master/src/main/kojo
