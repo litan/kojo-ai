@@ -68,12 +68,12 @@ package object dataframe {
     def tail(n: Int = 5): Table = df.last(n)
     def rows(n: Seq[Int]): Table = df.rows(n: _*)
     def columns[T: TypeTag](xs: Seq[T]): Table = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       typeOf[T] match {
         case t if t =:= typeOf[Int] =>
-          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[Int]]: _*).asScala: _*)
+          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[Int]]: _*).asScala.toSeq: _*)
         case t if t =:= typeOf[String] =>
-          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[String]]: _*).asScala: _*)
+          Table.create(df.name, df.columns(xs.asInstanceOf[Seq[String]]: _*).asScala.toSeq: _*)
         case _ =>
           throw new RuntimeException("Invalid column index")
       }
@@ -110,8 +110,8 @@ package object dataframe {
       require(cnt == 1, "Dataframe should have only one column")
       val cc = df.categoricalColumn(0)
       val catcnt = cc.countByCategory
-      barChart(" ", cc.name, "Percent", catcnt.stringColumn(0).asObjectArray,
-        catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
+      barChart(" ", cc.name, "Percent", catcnt.stringColumn(0).asObjectArray().toIndexedSeq,
+        catcnt.intColumn(1).asObjectArray().toIndexedSeq.map(_.toInt)).asInstanceOf[Chart[A, B]]
     }
 
     def makePieChart[A <: Styler, B <: Series](): Chart[A, B] = {
@@ -120,8 +120,8 @@ package object dataframe {
       require(cnt == 1, "Dataframe should have only one column")
       val cc = df.categoricalColumn(0)
       val catcnt = cc.countByCategory
-      pieChart(cc.name, catcnt.stringColumn(0).asObjectArray,
-        catcnt.intColumn(1).asObjectArray().map(_.toInt)).asInstanceOf[Chart[A, B]]
+      pieChart(cc.name, catcnt.stringColumn(0).asObjectArray().toIndexedSeq,
+        catcnt.intColumn(1).asObjectArray().toIndexedSeq.map(_.toInt)).asInstanceOf[Chart[A, B]]
     }
 
     def makeHistogram[A <: Styler, B <: Series](bins: Int = 10): Chart[A, B] = {

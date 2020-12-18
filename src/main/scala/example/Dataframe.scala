@@ -15,8 +15,8 @@ object Dataframe {
     df.head()
     df.stringColumn("gender").isMissing().size
 
-    val cats = df.categoricalColumn("Topic").countByCategory.stringColumn("Category").asObjectArray
-    val counts = df.categoricalColumn("Topic").countByCategory.intColumn("Count").asObjectArray.map(_.toInt)
+    val cats = df.categoricalColumn("Topic").countByCategory.stringColumn("Category").asObjectArray().toIndexedSeq
+    val counts = df.categoricalColumn("Topic").countByCategory.intColumn("Count").asObjectArray().toIndexedSeq.map(_.toInt)
     val chart = barChart("Subject Counts", "Subject", "Count", cats, counts)
     //    new SwingWrapper(chart).displayChart()
 

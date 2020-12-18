@@ -41,7 +41,7 @@ package object nn {
       val buf = ArrayBuffer.empty[T]
       val iter = t.entriesIterator
       while (iter.hasNext) {
-        buf += iter.next
+        buf += iter.next()
       }
       buf.toArray
     }
@@ -112,7 +112,7 @@ package object nn {
     var graph: Graph = _
     var session: Session = _
 
-    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer) {
+    def compile(lossFn: Output[Double] => Output[Double], optimizer: Optimizer): Unit = {
       def forward(layers: Seq[Layer], input: Output[Double])(implicit mode: Mode): Output[Double] = {
         var output = input
         layers.foreach { layer =>
@@ -141,7 +141,7 @@ package object nn {
       }
     }
 
-    def fit(xData: Array[Double], yData: Array[Double], epochs: Int) {
+    def fit(xData: Array[Double], yData: Array[Double], epochs: Int): Unit = {
       val xf = toDoubleTensor(xData)
       val yf = toDoubleTensor(yData)
 

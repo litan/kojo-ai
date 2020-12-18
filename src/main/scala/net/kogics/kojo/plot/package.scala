@@ -70,7 +70,7 @@ package object plot {
 
   private def addCategorySeriesToChart[N <: Number](chart: CategoryChart, name: Option[String], categories: Seq[String], values: Seq[N]): CategorySeries = {
     def asJavaList[A, B](xs: Seq[B]) = {
-      import scala.collection.JavaConverters._
+      import scala.jdk.CollectionConverters._
       xs.asJava.asInstanceOf[java.util.List[A]]
     }
 

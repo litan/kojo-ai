@@ -15,7 +15,7 @@ object NonLinearRegression {
     val b = 3
     val c = 10
     val xData0 = Array.tabulate(20)(e => (e + 1).toDouble)
-    val yData0 = xData0 map (x => a * x * x + b * x + c + math.random * 40 - 20)
+    val yData0 = xData0 map (x => a * x * x + b * x + c + math.random() * 40 - 20)
 
     val xNormalizer = new StandardScaler()
     val yNormalizer = new MaxAbsScaler()

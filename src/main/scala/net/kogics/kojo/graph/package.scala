@@ -13,6 +13,7 @@
  *
  */
 package net.kogics.kojo
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.collection.mutable.{Map => MMap}
 import scala.collection.mutable.{Set => MSet}
@@ -26,7 +27,7 @@ package object graph {
 
   class Stack[T] extends Container[T] {
     var impl: List[T] = Nil
-    def add(t: T, cost: Double = 0) {
+    def add(t: T, cost: Double = 0): Unit = {
       impl = t :: impl
     }
     def remove(): T = {
@@ -39,11 +40,11 @@ package object graph {
 
   class Queue[T] extends Container[T] {
     val impl = collection.mutable.Queue.empty[T]
-    def add(t: T, cost: Double = 0) {
+    def add(t: T, cost: Double = 0): Unit = {
       impl.enqueue(t)
     }
     def remove(): T = {
-      impl.dequeue
+      impl.dequeue()
     }
     def hasElements = !impl.isEmpty
   }
@@ -56,12 +57,12 @@ package object graph {
       }
     }
     val impl = collection.mutable.PriorityQueue.empty[TwithCost]
-    def add(t: T, cost: Double) {
+    def add(t: T, cost: Double): Unit = {
       //      println(s"adding: $t with cost $cost")
       impl.enqueue(TwithCost(t, cost))
     }
     def remove(): T = {
-      val head = impl.dequeue
+      val head = impl.dequeue()
       //      println(s"removing: ${head.t} with cost ${head.cost}")
       head.t
     }
@@ -73,7 +74,7 @@ package object graph {
 
   type GraphEdges[T] = MMap[Node[T], MSet[EdgeTo[T]]]
   type Nodes[T] = MSet[Node[T]]
-  type PathEdges[T] = Seq[EdgeTo[T]]
+  type PathEdges[T] = mutable.Seq[EdgeTo[T]]
   type ContainerElem[T] = (Node[T], PathEdges[T])
 
   trait Graph[T] {
@@ -87,7 +88,7 @@ package object graph {
     type CostFn[T] = (PathEdges[T], Node[T]) => Double
     type HeuristicFn[T] = (Node[T], Node[T]) => Double
 
-    def noOpCallback[T](n: Node[T]) {}
+    def noOpCallback[T](n: Node[T]): Unit = {}
     def dfs[T](graph: Graph[T], start: Node[T], end: Node[T],
                visitCallback: Node[T] => Unit = noOpCallback _): Option[PathEdges[T]] = {
       def cost(pathEdges: PathEdges[T], end: Node[T]): Double = 0
@@ -130,7 +131,7 @@ package object graph {
         container.add((start, ArrayBuffer()))
         val visited = new collection.mutable.HashSet[Node[T]]
         while (container.hasElements) {
-          val elem = container.remove
+          val elem = container.remove()
           val elemNode = elem._1
           val elemPath = elem._2
           if (!visited.contains(elemNode)) {

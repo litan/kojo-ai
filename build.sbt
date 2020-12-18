@@ -1,20 +1,25 @@
 name := "Kojo-AI"
 
-version := "0.1"
+version := "0.2"
 
-scalaVersion := "2.12.8"
+scalaVersion := "2.13.3"
 
 fork in run := true
 
-scalacOptions := Seq("-feature", "-deprecation", "-Ypartial-unification")
+scalacOptions := Seq("-deprecation")
 javaOptions in run ++= Seq("-Xmx1024m", "-Xss1m", "-XX:+UseConcMarkSweepGC", "-XX:+CMSClassUnloadingEnabled")
 
 libraryDependencies ++= Seq(
-    "org.platanios" %% "tensorflow" % "0.4.1" classifier "linux-cpu-x86_64",
-    "org.platanios" %% "tensorflow-data" % "0.4.1",
+    "org.platanios" %% "tensorflow" % "0.5.10" classifier "linux",
+    "org.platanios" %% "tensorflow-data" % "0.5.10",
     "org.knowm.xchart" % "xchart" % "3.5.4",
     "tech.tablesaw" % "tablesaw-core" % "0.31.0"
 )
+
+javaCppPresetLibs ++= Seq(
+  "ffmpeg" -> "4.0.2"
+)
+
 
 //Build distribution
 val distOutpath             = settingKey[File]("Where to copy all dependencies and kojo-ml")
