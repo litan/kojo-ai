@@ -1,5 +1,7 @@
 **A newer version of this project is available. [Please use the newer version](https://github.com/litan/kojo-ai-2).**
 
+---
+
 # Kojo-AI
 Support for data science, machine learning, and more - within Kojo.
 
